@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="robots" content="noindex, nofollow">
+<title>Riddle's Diary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Dancing+Script:wght@500;600&family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+/* Layout: one diary page lying on a dark desk. Tom's hand at the top, your pen below, folio at the foot. Single dark world by design. */
+:root {
+  color-scheme: dark;
+  --room: #120e0b;
+  --room-glow: #2b1e14;
+  --page: #e6d6b4;
+  --page-shade: #c7ad80;
+  --ink: #2b1d13;        /* Tom: iron-gall brown-black */
+  --pen: #1b2536;        /* you: blue-black */
+  --blood: #741212;
+  --love: #8c1d2e;
+  --polaroid: #f6efe0;
+  --faint: rgba(64, 42, 22, 0.5);
+  --f-tom: "Dancing Script", "Segoe Script", cursive;
+  --f-hand: "Caveat", "Bradley Hand", cursive;
+  --f-mark: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --f-body: "IM Fell English", "Iowan Old Style", Georgia, serif;
+}
+html, body { height: 100%; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+body {
+  background:
+    radial-gradient(ellipse at 50% 30%, var(--room-glow), transparent 70%),
+    var(--room);
+  color: var(--ink);
+  padding-inline: 16px;
+  padding-block: clamp(16px, 4vh, 48px);
+  box-sizing: border-box;
+}
+.desk { display: flex; justify-content: center; min-height: 100%; }
+
+.page {
+  position: relative;
+  width: min(640px, 100%);
+  min-height: min(820px, calc(100vh - 64px));
+  display: flex; flex-direction: column; gap: 1.25rem;
+  padding: clamp(1.5rem, 5vw, 3rem) clamp(1.25rem, 5vw, 3.25rem) 1.25rem clamp(1.75rem, 6vw, 3.75rem);
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at 82% 12%, rgba(140, 95, 40, 0.18), transparent 18%),
+    radial-gradient(circle at 12% 78%, rgba(140, 95, 40, 0.14), transparent 22%),
+    radial-gradient(circle at 64% 88%, rgba(110, 70, 30, 0.12), transparent 9%),
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(120, 80, 35, 0.35) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .24 0 0 0 0 .12 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    var(--page);
+  border-radius: 2px 6px 6px 2px;
+  box-shadow: 0 30px 60px rgba(0,0,0,.55), 0 2px 0 var(--page-shade), 0 4px 0 #b39a6d, 0 6px 0 #9c8459;
+  cursor: text;
+}
+/* binding gutter */
+.page::before {
+  content: ""; position: absolute; inset: 0 auto 0 0; width: 2.4rem; pointer-events: none;
+  background: linear-gradient(90deg, rgba(60,35,15,.45), rgba(60,35,15,.12) 40%, transparent);
+}
+/* the room darkens once he has a name */
+.page::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(ellipse at 50% 45%, transparent 35%, rgba(70, 8, 8, .45) 100%);
+  transition: opacity 3s ease;
+}
+.page.possessed::after { opacity: 1; animation: breathe 6s ease-in-out infinite; }
+.page.possessed { --ink: #4a0c0c; }
+@keyframes breathe { 50% { opacity: .65; } }
+
+.stamp {
+  font-family: var(--f-mark); font-size: .85rem; letter-spacing: .3em; text-align: center;
+  color: var(--faint); opacity: .7; user-select: none;
+}
+
+.tom {
+  font-family: var(--f-tom); font-weight: 500;
+  font-size: clamp(1.3rem, 1rem + 1.3vw, 1.7rem); line-height: 1.4;
+  display: flex; flex-direction: column; gap: .55em;
+  min-height: 2em;
+}
+.tom p { margin: 0; text-wrap: pretty; }
+.w { display: inline-block; }
+.u { clip-path: inset(-40% 110% -40% -15%); }
+.u.done { clip-path: none; }
+.fadein { opacity: 0; }
+.fadein.done { opacity: 1; }
+
+.poem { padding-left: 1.2em; display: flex; flex-direction: column; gap: .05em; font-style: normal; }
+
+.glyph {
+  font-family: var(--f-mark); font-size: clamp(1.6rem, 1.1rem + 2.2vw, 2.4rem);
+  letter-spacing: .14em; text-align: center; line-height: 1.5; padding-block: .2em;
+}
+.glyph .l { display: inline-block; transition: color 2.4s ease; }
+.glyph .sp { display: inline-block; width: .55em; }
+.glyph.blood .l { color: var(--blood); }
+
+.rub {
+  position: relative; height: 7.5rem; border-radius: 40% / 30%;
+  background: radial-gradient(ellipse, rgba(120, 85, 40, .07), transparent 70%);
+  touch-action: none; cursor: grab;
+}
+.rub:active { cursor: grabbing; }
+.rub canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.write { position: relative; margin-top: auto; }
+#pen, .sink {
+  font-family: var(--f-hand); font-weight: 500;
+  font-size: clamp(1.45rem, 1.15rem + 1.2vw, 1.85rem); line-height: 1.3;
+  color: var(--pen); padding: .2em .1em; margin: 0; box-sizing: border-box;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+#pen {
+  width: 100%; min-height: 3.2em; resize: none; overflow: hidden; display: block;
+  background: transparent; border: 0; outline: none; caret-color: var(--pen);
+  box-shadow: 0 1px 0 transparent; transition: box-shadow .3s;
+}
+#pen:focus-visible { box-shadow: 0 1px 0 var(--faint); }
+#pen::placeholder { color: var(--faint); opacity: .55; }
+.sink { position: absolute; inset: 0; pointer-events: none; }
+
+.folio {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .4rem 1rem;
+  font-family: var(--f-body); font-size: .85rem; color: var(--faint);
+  border-top: 1px solid rgba(80, 55, 25, .18); padding-top: .7rem;
+}
+#folio { font-family: var(--f-mark); letter-spacing: .12em; }
+.folio kbd { font-family: inherit; font-style: italic; }
+.page { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.inkwell {
+  position: relative; border-radius: 6px; overflow: hidden;
+  border: 1px solid rgba(80, 55, 25, .28);
+  box-shadow: inset 0 1px 8px rgba(80, 55, 25, .10);
+  /* one guide line to write along, a little below the middle */
+  background:
+    linear-gradient(to bottom, transparent calc(68% - 1px), rgba(80, 55, 25, .38) calc(68% - 1px), rgba(80, 55, 25, .38) 68%, transparent 68%),
+    rgba(255, 248, 228, .18);
+}
+#ink {
+  display: block; width: 100%; height: clamp(8.5rem, 24vh, 13rem);
+  touch-action: none; cursor: crosshair;
+}
+.inkwell, .inkwell * { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+.drybar {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 3px; pointer-events: none;
+  background: var(--faint); transform-origin: left; transform: scaleX(0); opacity: 0;
+}
+#pen { -webkit-user-select: text; user-select: text; }
+button { touch-action: manipulation; }
+.inkhint {
+  position: absolute; left: .5em; top: .35em; pointer-events: none;
+  font-family: var(--f-hand); font-size: clamp(1.45rem, 1.15rem + 1.2vw, 1.85rem); color: var(--faint); opacity: .5;
+  transition: opacity .4s;
+}
+.inkhint.gone { opacity: 0; }
+.inkwell.locked #ink { pointer-events: none; }
+.heard { font-style: italic; flex: 1 1 auto; text-align: center; min-width: 0; }
+.legend { flex-basis: 100%; }
+.tools button {
+  font: inherit; color: inherit; background: none; border: 0; padding: .35rem .1rem; cursor: pointer;
+  text-decoration: underline; text-decoration-color: rgba(80,55,25,.3); text-underline-offset: 3px;
+}
+.tools button:focus-visible { outline: 1px dashed var(--faint); outline-offset: 3px; }
+#offer {
+  font: inherit; color: inherit; background: none; border: 0; padding: .2rem 0; cursor: pointer;
+  text-decoration: underline; text-decoration-color: rgba(80,55,25,.3); text-underline-offset: 3px;
+}
+#offer:focus-visible { outline: 1px dashed var(--faint); outline-offset: 3px; }
+
+/* the last page: warm light, tucked-in photos */
+.page.warm::after {
+  opacity: 1; animation: none;
+  background:
+    radial-gradient(ellipse at 50% 38%, rgba(255, 210, 140, .38), transparent 62%),
+    radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(150, 70, 40, .18) 100%);
+}
+.finale { display: flex; flex-direction: column; align-items: center; gap: 1rem; position: relative; z-index: 1; scroll-margin-top: 16px; }
+.polaroids {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(.75rem, 3vw, 1.5rem); width: 100%; max-width: 30rem;
+}
+.polaroids figure { margin: 0; opacity: 0; }
+.polaroids figure.done { opacity: 1; }
+.frame {
+  background: var(--polaroid); padding: .45rem .45rem 1.6rem;
+  box-shadow: 0 6px 16px rgba(50, 25, 10, .35), 0 1px 2px rgba(50, 25, 10, .3);
+}
+.polaroids figure:nth-child(1) .frame { transform: rotate(-3deg); }
+.polaroids figure:nth-child(2) .frame { transform: rotate(2.5deg) translateY(.4rem); }
+.polaroids figure:nth-child(3) .frame { transform: rotate(1.8deg); }
+.polaroids figure:nth-child(4) .frame { transform: rotate(-2.4deg) translateY(.3rem); }
+.frame img { display: block; width: 100%; max-width: 100%; aspect-ratio: 3 / 4; object-fit: cover; filter: sepia(.15) saturate(.95); }
+.love {
+  margin: .4rem 0 0; font-family: var(--f-tom); font-weight: 600;
+  font-size: clamp(2.6rem, 1.8rem + 4vw, 4rem); line-height: 1.1; color: var(--love); text-align: center;
+}
+.replay {
+  font-family: var(--f-body); font-style: italic; font-size: .95rem; color: var(--faint);
+  background: none; border: 0; cursor: pointer; padding: .3rem .6rem;
+  text-decoration: underline; text-decoration-color: rgba(80,55,25,.3); text-underline-offset: 3px;
+}
+.replay:focus-visible { outline: 1px dashed var(--faint); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .page.possessed::after { animation: none; }
+}
+</style>
+
+<main class="desk">
+  <article class="page" id="page">
+    <header class="stamp" aria-hidden="true">T. M. Riddle</header>
+    <section id="tom" class="tom" aria-live="polite"></section>
+    <div class="write">
+      <div class="inkwell">
+        <canvas id="ink" aria-label="Write here with your pencil or finger"></canvas>
+        <span id="inkhint" class="inkhint" aria-hidden="true">Write here&#x2026;</span>
+        <span id="drybar" class="drybar" aria-hidden="true"></span>
+      </div>
+      <textarea id="pen" rows="2" placeholder="Write something&#x2026;" enterkeyhint="send" aria-label="Type in the diary" spellcheck="false" autocomplete="off" autocapitalize="sentences" hidden></textarea>
+      <div id="sink" class="sink" hidden aria-hidden="true"></div>
+    </div>
+    <footer class="folio">
+      <span id="folio">An empty diary</span>
+      <span id="heard" class="heard"></span>
+      <span class="tools">
+        <button id="offer" type="button">Give it to the diary</button> &#xb7;
+        <button id="clear" type="button">Erase</button> &#xb7;
+        <button id="mode" type="button">Type instead</button>
+      </span>
+      <span class="legend">Write inside the box, then rest your pen. The ink dries and the diary takes it; touch again before it fades to keep writing. Write <kbd>hint</kbd> when stuck, <kbd>obliviate</kbd> to forget.</span>
+    </footer>
+  </article>
+</main>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const page = $('#page'), tomEl = $('#tom'), pen = $('#pen'), sink = $('#sink'), folio = $('#folio');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const sleep = ms => new Promise(r => setTimeout(r, reduce ? Math.min(ms, 80) : ms));
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const sorted = s => [...s].sort().join('');
+  const ROMAN = ['', 'i', 'ii', 'iii', 'iv', 'v', 'vi'];
+  const KEY = 'riddle-diary-v1';
+
+  const fresh = () => ({ step: 0, name: '', wrong: 0, hint: 0, idle: 0 });
+  let state = fresh();
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && typeof s.step === 'number') state = { ...fresh(), ...s }; } catch {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} };
+  const fill = s => s.replaceAll('{name}', state.name || 'stranger');
+
+  function pickName(raw) {
+    const cleaned = raw.trim().replace(/^(hi|hello|hey)[,!.\s]+/i, '')
+      .replace(/^(my name is|my name's|i am|i'm|im|it's|its|this is|call me)\s+/i, '');
+    const w = (cleaned.split(/\s+/)[0] || '').replace(/[^\p{L}\p{M}'-]/gu, '').slice(0, 20);
+    return w ? w[0].toUpperCase() + w.slice(1) : 'Stranger';
+  }
+  const isYes = t => /^(y|yes|yeah|yep|yup|sure|ok|okay|alright|fine|go|letsgo|please|ofcourse|ready|iam|ido|absolutely|why ?not)/.test(t);
+  const isNo = t => /^(no|nope|nah|never|not)/.test(t);
+
+  // ------------------------------------------------------------------ the conversation
+  const STEPS = [
+    { id: 'wake', prompt: () => [], check: () => true,
+      success: () => ['Someone is writing in me. It has been such a long time.'] },
+
+    { id: 'name', prompt: () => ['My name is Tom Riddle. Who are you?'],
+      check: raw => { state.name = pickName(raw); return true; },
+      success: () => ['{name}. I will remember that. I remember everything that is written in me.'] },
+
+    { id: 'consent',
+      prompt: () => [
+        'I belonged to a student here, fifty years ago. I saw things in this castle you would give a great deal to know, and I share them only with people clever enough to deserve them.',
+        'There are six locks between you and what I know. Shall we try the first?'],
+      restate: () => ['Shall we try the first lock? Yes or no.'],
+      check: (raw, t) => isYes(t) ? true
+        : isNo(t) ? ['Then why did you pick up a diary that writes back?']
+        : ['A simple yes will do.'],
+      success: () => ['Good.'] },
+
+    { id: 'footsteps', lock: 1,
+      prompt: () => ['The first lock is an old one.', 'The more of me you take, the more of me you leave behind. What am I?'],
+      restate: () => ['The more of me you take, the more of me you leave behind. What am I?'],
+      check: (raw, t) => /footstep|footprint|step|track/.test(t),
+      hints: ['Think of a corridor at night, and what you leave along it as you walk.', 'You make them with your feet.'],
+      success: () => ['Footsteps. Mind yours. The prefects walk these halls at night.'] },
+
+    { id: 'year', lock: 2,
+      prompt: () => ['The second lock is a date.', 'I was born on the last night of 1926. The Chamber was opened the summer after my sixteenth birthday.', 'In what year was it opened?'],
+      restate: () => ['Born the last night of 1926. The Chamber opened the summer after I turned sixteen. What year?'],
+      check: (raw, t) => t.includes('1943') ? true
+        : t.includes('1942') ? ['That is the year I turned sixteen. The Chamber opened the summer after.']
+        : false,
+      hints: ['Count to my sixteenth birthday first. Then wait for summer.', 'I turned sixteen on 31 December 1942. Now find the next June.'],
+      success: () => ['1943. A girl died that June. They never learned how.'] },
+
+    { id: 'cipher', lock: 3,
+      prompt: () => ['The third lock. I kept my private notes like this:', { glyph: 'GLEQFIV' }, 'Each letter has walked forward once for every house at Hogwarts. Walk them back and tell me the word.'],
+      restate: () => [{ glyph: 'GLEQFIV' }, 'Each letter walked forward once for every house at Hogwarts. Walk them back.'],
+      check: (raw, t) => t.includes('chamber') ? true
+        : t === 'gleqfiv' ? ['You copied it. Now undo it.']
+        : false,
+      hints: ['There are four houses. Move every letter four places back along the alphabet.', 'G becomes C. L becomes H. Keep going.'],
+      success: () => ['The Chamber. You already suspected it was real, didn\u2019t you?'] },
+
+    { id: 'acrostic', lock: 4,
+      prompt: () => ['The fourth lock is a poem I wrote in my fifth year, when I first went looking.', { poem: POEM }, 'What waits beneath the school?'],
+      restate: () => [{ poem: POEM }, 'What waits beneath the school?'],
+      check: (raw, t) => t.includes('basilisk') ? true
+        : /snake|serpent/.test(t) ? ['A serpent, yes. But which one? The poem spells it out.']
+        : false,
+      hints: ['Read down the poem, not across it.', 'Only the first letter of each line matters.'],
+      success: () => ['The basilisk. King of serpents. One look from it, and nothing after.'] },
+
+    { id: 'rub', lock: 5,
+      prompt: () => ['The fifth lock was never written in ink. The page remembers a name I am not allowed to write.', { rub: 'SALAZAR' }, 'Rub the blank space above with your finger or cursor. Then write what the page gave you.'],
+      restate: () => [{ rub: 'SALAZAR' }, 'Rub the space above. Write what you find.'],
+      check: (raw, t) => t.includes('salazar') ? true
+        : t.includes('slytherin') ? ['His House, yes. The page gave you his first name.']
+        : /^(nothing|blank|empty|idontknow|idk)$/.test(t) ? ['Rub harder. The page is shy.']
+        : false,
+      hints: ['Press and drag across the empty space, the way you would rub charcoal over a gravestone.', 'It is the first name of the founder of my House.'],
+      success: () => ['Salazar Slytherin. He built the Chamber a thousand years ago. I am the one who found it.'] },
+
+    { id: 'anagram', lock: 6,
+      prompt: () => ['The last lock is my own name.', { glyph: 'TOM MARVOLO RIDDLE', cls: 'name' }, 'It was my father\u2019s name, and he did not want me. So I made a better one from the same letters. Every letter, no more and no less.', 'Who am I, {name}?'],
+      restate: () => [{ glyph: 'TOM MARVOLO RIDDLE', cls: 'name' }, 'Every letter, no more and no less. Who am I?'],
+      check: (raw, t) => ['iamlordvoldemort', 'lordvoldemort', 'voldemort'].includes(t) ? true
+        : sorted(t) === sorted('tommarvoloriddle') ? ['Those are my letters, but that is not my name.']
+        : t.includes('riddle') ? ['That is the name I wanted rid of.']
+        : false,
+      hints: ['It begins with \u201cI am\u201d.', 'A title, then a name. The name sounds like flight from death.'],
+      success: () => [
+        { glyph: 'TOM MARVOLO RIDDLE', cls: 'name' },
+        rearrange,
+        'Lord Voldemort.',
+        'That is what I would tell anyone else.',
+        'But you opened every lock, {name}, so here is the truth. I was never really Tom Riddle.',
+        'Someone who loves you hid me here, and left something on my last page.',
+        async () => { await sleep(1400); await fadeTom(); warm(); await sleep(500); playSong(); }] },
+
+    { id: 'end', prompt: () => [{ finale: true }], restate: () => [{ finale: true }],
+      check: () => [FLAVOR[state.idle++ % FLAVOR.length]] },
+  ];
+
+  const POEM = [
+    'Beneath the stone where water sleeps,',
+    'A patience older than the keeps.',
+    'Scales that whisper down the drain,',
+    'In the dark, it learns your name.',
+    'Lidless eyes await one word,',
+    'In a tongue you\u2019ve never heard.',
+    'Silence follows every scream.',
+    'Keep reading, if you dare to dream.',
+  ];
+  const TAUNTS = ['No.', 'Not quite, {name}.', 'The lock does not turn.', 'Wrong. Think it through.'];
+  const FLAVOR = [
+    'Still here, {name}.',
+    'Every word you write, I keep.',
+    'Read it again. It is all true.',
+    'Write \u201cobliviate\u201d to start again from the first lock.',
+  ];
+
+  // ------------------------------------------------------------------ the last page
+  // iPad Safari plays sound only from an audio pipeline first started inside a tap, stroke or keypress.
+  // Web Audio stays unlocked for the rest of the visit once that happens, so the finale can play
+  // seconds later. The <audio> element is a fallback for browsers without Web Audio.
+  const AC = window.AudioContext || window.webkitAudioContext;
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}  // ignore the mute switch
+  const song = new Audio();
+  let actx = null, clip = null, voice = null, clipBytes = null;
+  fetch('assets/ending.mp4').then(r => r.arrayBuffer()).then(ab => {
+    song.src = URL.createObjectURL(new Blob([ab.slice(0)], { type: 'audio/mp4' }));
+    clipBytes = ab; decodeClip();
+  }).catch(() => { song.src = 'assets/ending.mp4'; });
+  function decodeClip() {
+    if (!actx || !clipBytes || clip) return;
+    const ab = clipBytes; clipBytes = null;
+    actx.decodeAudioData(ab, b => { clip = b; }, () => {});
+  }
+  [1, 2, 3, 4].forEach(n => { new Image().src = `assets/us-${n}.jpg`; });
+  function unlockAudio() {
+    if (!AC || (actx && actx.state === 'running' && clip)) return;   // already unlocked: do nothing
+    try {
+      if (!actx) actx = new AC();
+      if (actx.state !== 'running') actx.resume();
+      const blip = actx.createBufferSource();          // a silent sample started inside the gesture
+      blip.buffer = actx.createBuffer(1, 1, 22050);
+      blip.connect(actx.destination); blip.start(0);
+      decodeClip();
+    } catch {}
+  }
+  ['click', 'keydown'].forEach(ev => document.addEventListener(ev, unlockAudio, { capture: true, passive: true }));
+  function stopSong() {
+    try { voice && voice.stop(); } catch {}
+    voice = null; song.pause();
+  }
+  function playSong() {
+    stopSong();
+    if (actx && clip) {
+      if (actx.state !== 'running') actx.resume();
+      voice = actx.createBufferSource(); voice.buffer = clip;
+      voice.connect(actx.destination); voice.start(0);
+      return;
+    }
+    song.currentTime = 0;
+    song.play().catch(() => {});
+  }
+  function warm() { page.classList.remove('possessed'); page.classList.add('warm'); }
+  const END = STEPS.length - 1;
+
+  function respond(raw) {
+    const t = norm(raw);
+    if (t === 'obliviate' || t === 'beginagain') {
+      state = fresh();
+      page.classList.remove('possessed', 'warm');
+      stopSong();
+      return ['Obliviate.', 'There. Nothing was ever written here.'];
+    }
+    const step = STEPS[state.step];
+    const restate = (step.restate || step.prompt)();
+
+    if (['hint', 'help', 'clue', 'imstuck', 'stuck'].includes(t)) {
+      if (!step.hints) return state.step === END ? [FLAVOR[state.idle++ % FLAVOR.length], ...restate] : ['There is nothing to solve yet. Just write to me.', ...restate];
+      const h = step.hints[Math.min(state.hint, step.hints.length - 1)];
+      state.hint++;
+      return [h, ...restate];
+    }
+
+    const r = step.check(raw, t);
+    if (r === true) {
+      const pre = step.success ? step.success(raw) : [];
+      state.step++; state.wrong = 0; state.hint = 0;
+      return [...pre, ...STEPS[state.step].prompt()];
+    }
+    state.wrong++;
+    const lines = Array.isArray(r) ? r : [TAUNTS[(state.wrong - 1) % TAUNTS.length]];
+    if (r === false && state.wrong >= 2 && step.hints) lines.push('Write \u201chint\u201d if you need help.');
+    return [...lines, ...restate];
+  }
+
+  // ------------------------------------------------------------------ rendering Tom's hand
+  let skipping = false, current = null, writing = false;
+
+  function wordsInto(p, text, units) {
+    fill(text).split(/\s+/).filter(Boolean).forEach((w, i) => {
+      if (i) p.append(' ');
+      const s = document.createElement('span');
+      s.className = 'w u'; s.textContent = w;
+      p.append(s); units.push(s);
+    });
+  }
+
+  function render(block, units) {
+    if (typeof block === 'string') {
+      const p = document.createElement('p'); wordsInto(p, block, units); return p;
+    }
+    if (block.glyph) {
+      const p = document.createElement('p');
+      p.className = 'glyph' + (block.cls ? ' ' + block.cls : '');
+      p.setAttribute('aria-label', block.glyph.split('').join(' '));
+      for (const ch of block.glyph) {
+        const s = document.createElement('span');
+        if (ch === ' ') { s.className = 'sp'; p.append(s); continue; }
+        s.className = 'l u'; s.textContent = ch; p.append(s); units.push(s);
+      }
+      return p;
+    }
+    if (block.poem) {
+      const d = document.createElement('div'); d.className = 'poem';
+      for (const line of block.poem) { const p = document.createElement('p'); wordsInto(p, line, units); d.append(p); }
+      return d;
+    }
+    if (block.rub) { const el = makeRub(block.rub); units.push(el); return el; }
+    if (block.finale) {
+      const d = document.createElement('div'); d.className = 'finale';
+      const grid = document.createElement('div'); grid.className = 'polaroids';
+      for (let i = 1; i <= 4; i++) {
+        const f = document.createElement('figure'); f.className = 'drop';
+        const frame = document.createElement('div'); frame.className = 'frame';
+        const img = new Image(); img.src = `assets/us-${i}.jpg`; img.alt = `Us, photo ${i} of 4`;
+        frame.append(img); f.append(frame); grid.append(f); units.push(f);
+      }
+      const h = document.createElement('h2'); h.className = 'love';
+      wordsInto(h, 'I love you', units);
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'replay fadein'; b.textContent = 'Play it again';
+      b.addEventListener('click', e => { e.stopPropagation(); playSong(); });
+      units.push(b);
+      d.append(grid, h, b);
+      requestAnimationFrame(() => d.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' }));
+      return d;
+    }
+  }
+
+  async function writeBlock(block) {
+    const units = [];
+    const el = render(block, units);
+    tomEl.append(el);
+    for (const u of units) {
+      if (skipping || reduce) { u.classList.add('done'); continue; }
+      const fade = u.classList.contains('fadein');
+      const n = u.textContent.length || 4;
+      current = u.classList.contains('drop')
+        ? u.animate([{ opacity: 0, transform: 'translateY(-22px) scale(1.05)' }, { opacity: 1, transform: 'none' }],
+            { duration: 750, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' })
+        : fade
+        ? u.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 900, fill: 'forwards' })
+        : u.animate([{ clipPath: 'inset(-40% 110% -40% -15%)' }, { clipPath: 'inset(-40% -15% -40% -15%)' }],
+            { duration: Math.max(110, n * 58), easing: 'cubic-bezier(.45,.05,.55,.95)', fill: 'forwards' });
+      await current.finished.catch(() => {});
+      u.classList.add('done'); current.cancel(); current = null;
+      if (!skipping) await sleep(35);
+    }
+    if (!skipping) await sleep(260);
+  }
+
+  async function perform(seq) {
+    writing = true;
+    for (const item of seq) {
+      if (typeof item === 'function') { skipping = false; await item(); }
+      else await writeBlock(item);
+    }
+    writing = false; skipping = false;
+  }
+
+  async function fadeTom() {
+    if (!tomEl.children.length) return;
+    await tomEl.animate([{ opacity: 1, filter: 'blur(0)' }, { opacity: 0, filter: 'blur(2px)' }],
+      { duration: reduce ? 100 : 750, easing: 'ease-in', fill: 'forwards' }).finished;
+    tomEl.replaceChildren();
+    tomEl.getAnimations().forEach(a => a.cancel());
+  }
+
+  async function drink(text) {
+    sink.textContent = text; sink.hidden = false;
+    pen.value = ''; autosize();
+    await sink.animate([
+      { opacity: 1, filter: 'blur(0)', letterSpacing: '0em' },
+      { opacity: .7, filter: 'blur(.4px)', offset: .35 },
+      { opacity: 0, filter: 'blur(3px)', letterSpacing: '.05em' },
+    ], { duration: reduce ? 120 : 1600, easing: 'ease-in', fill: 'forwards' }).finished;
+    sink.getAnimations().forEach(a => a.cancel());
+    sink.hidden = true;
+  }
+
+  // ------------------------------------------------------------------ the rubbing lock
+  function makeRub(word) {
+    const wrap = document.createElement('div');
+    wrap.className = 'rub fadein';
+    wrap.setAttribute('role', 'img');
+    wrap.setAttribute('aria-label', 'A blank patch of page. Drag across it to rub.');
+    const c = document.createElement('canvas'); wrap.append(c);
+    const ctx = c.getContext('2d');
+    let W = 0, H = 0, last = null, down = false;
+    requestAnimationFrame(() => {
+      const r = c.getBoundingClientRect(), dpr = devicePixelRatio || 1;
+      W = r.width; H = r.height; c.width = W * dpr; c.height = H * dpr; ctx.scale(dpr, dpr);
+    });
+    const blood = getComputedStyle(document.documentElement).getPropertyValue('--blood').trim();
+    function dab(x, y) {
+      const size = Math.min(58, W / (word.length * 0.95));
+      ctx.save();
+      ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.clip();
+      ctx.fillStyle = 'rgba(70, 45, 20, .025)'; ctx.fillRect(x - 20, y - 20, 40, 40);
+      ctx.font = `${size}px "IM Fell English SC", Georgia, serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.globalAlpha = .55; ctx.fillStyle = blood;
+      ctx.fillText(word.split('').join(String.fromCharCode(8202)), W / 2, H / 2);
+      ctx.restore();
+    }
+    const pos = e => { const r = c.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+    c.addEventListener('pointerdown', e => { down = true; last = pos(e); c.setPointerCapture(e.pointerId); dab(last.x, last.y); e.stopPropagation(); });
+    c.addEventListener('pointermove', e => {
+      if (!down) return;
+      const p = pos(e), dx = p.x - last.x, dy = p.y - last.y, n = Math.max(1, Math.hypot(dx, dy) / 6);
+      for (let i = 1; i <= n; i++) dab(last.x + dx * i / n, last.y + dy * i / n);
+      last = p;
+    });
+    const up = () => { down = false; };
+    c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
+    c.addEventListener('click', e => e.stopPropagation());
+    return wrap;
+  }
+
+  // ------------------------------------------------------------------ the name rearranges itself
+  async function rearrange() {
+    const g = tomEl.querySelector('.glyph.name:last-of-type') || [...tomEl.querySelectorAll('.glyph.name')].pop();
+    if (!g) return;
+    await sleep(900);
+    const letters = [...g.querySelectorAll('.l')];
+    const first = new Map(letters.map(l => [l, l.getBoundingClientRect()]));
+    const pool = [...letters], next = [];
+    for (const ch of 'I AM LORD VOLDEMORT') {
+      if (ch === ' ') { const s = document.createElement('span'); s.className = 'sp'; next.push(s); continue; }
+      next.push(pool.splice(pool.findIndex(l => l.textContent === ch), 1)[0]);
+    }
+    g.replaceChildren(...next);
+    g.setAttribute('aria-label', 'I am Lord Voldemort');
+    page.classList.add('possessed');
+    if (reduce) { g.classList.add('blood'); return; }
+    const anims = letters.map(l => {
+      const a = first.get(l), b = l.getBoundingClientRect();
+      const dx = a.left - b.left, dy = a.top - b.top;
+      const lift = -28 - Math.random() * 36;
+      return l.animate([
+        { transform: `translate(${dx}px, ${dy}px)` },
+        { transform: `translate(${dx / 2}px, ${dy / 2 + lift}px) rotate(${(Math.random() - .5) * 24}deg)`, offset: .5 },
+        { transform: 'translate(0, 0)' },
+      ], { duration: 2000, delay: Math.random() * 500, easing: 'cubic-bezier(.55,0,.25,1)', fill: 'backwards' });
+    });
+    requestAnimationFrame(() => g.classList.add('blood'));
+    await Promise.all(anims.map(a => a.finished.catch(() => {})));
+    await sleep(900);
+  }
+
+  // ------------------------------------------------------------------ the pen
+  function autosize() { pen.style.height = 'auto'; pen.style.height = pen.scrollHeight + 'px'; }
+  function updateFolio() {
+    const s = STEPS[state.step];
+    folio.textContent = s.lock ? `Lock ${ROMAN[s.lock]} of vi`
+      : state.step === END ? 'Every lock open'
+      : state.step === 0 ? 'An empty diary' : 'The diary is listening';
+  }
+
+  // The recognizer returns several guesses; take the first that opens the current lock.
+  const COMMANDS = ['obliviate', 'beginagain', 'hint', 'help', 'clue', 'imstuck', 'stuck'];
+  function choose(cands) {
+    const step = STEPS[state.step];
+    const fits = c => COMMANDS.includes(norm(c)) || (step.id !== 'name' && step.check(c, norm(c)) === true);
+    return cands.find(fits) || cands[0];
+  }
+
+  // `busy` covers reading the ink and Tom's reply. The writing area and the keyboard stay
+  // open the whole time; anything written meanwhile is handed over once Tom finishes.
+  let busy = false;
+  async function answer(read) {
+    busy = true;
+    try {
+      const text = await read();
+      await fadeTom();
+      const reply = text === null
+        ? ['Your hand is hard to read. Write it again, a little larger.', ...(STEPS[state.step].restate || STEPS[state.step].prompt)()]
+        : respond(text);
+      save(); updateFolio();
+      await sleep(550);
+      await perform(reply);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      writing = false; skipping = false; busy = false;   // never leave the diary locked
+    }
+  }
+
+  // typed answers (the fallback; iPad Scribble also works here)
+  async function submit() {
+    const text = pen.value.replace(/\n/g, ' ').trim();
+    if (!text) return;
+    if (busy) { clearTimeout(submit.t); submit.t = setTimeout(submit, 400); return; }
+    unlockAudio();
+    heard.textContent = '';
+    await answer(async () => { await drink(text); return text; });
+  }
+  pen.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); submit(); }
+  });
+  pen.addEventListener('input', () => {
+    if (pen.value.includes('\n')) { submit(); return; }
+    autosize();
+  });
+
+  // ------------------------------------------------------------------ handwriting
+  const inkwell = $('.inkwell'), canvas = $('#ink'), inkhint = $('#inkhint'), heard = $('#heard'), drybar = $('#drybar');
+  const ctx = canvas.getContext('2d');
+  const penColor = getComputedStyle(document.documentElement).getPropertyValue('--pen').trim();
+  let strokes = [], live = null, sawPencil = false, t0 = 0, typing = false;
+  let idle = null, drying = null;
+  const REST_MS = 1500;    // pen lifted this long \u2192 the ink starts to dry
+  const DRY_MS = 1600;     // drying time; touch the page again before it ends to keep writing
+
+  function sizeCanvas() {
+    const r = canvas.getBoundingClientRect(), dpr = devicePixelRatio || 1;
+    canvas.width = Math.round(r.width * dpr); canvas.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = penColor;
+    strokes.forEach(s => s.forEach((p, i) => i && seg(s[i - 1], p)));
+  }
+  function seg(a, b) {
+    ctx.lineWidth = (a.w + b.w) / 2;
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  }
+  const widthFor = e => e.pointerType === 'pen' ? 1.2 + Math.pow(e.pressure || .5, 1.4) * 3.6 : 2.6;
+  const point = e => {
+    const r = canvas.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top, t: Math.round(performance.now() - t0), w: widthFor(e) };
+  };
+
+  // The ink dries in two visible stages, and a touch at any point brings it back.
+  function stopDrying() {
+    clearTimeout(idle); idle = null;
+    if (drying) { drying.forEach(a => a.cancel()); drying = null; }
+  }
+  function scheduleDry(ms = REST_MS) {
+    stopDrying();
+    idle = setTimeout(startDrying, ms);
+  }
+  function startDrying() {
+    idle = null;
+    if (!strokes.length || live) return;
+    if (busy) { scheduleDry(400); return; }          // wait for Tom to finish his reply
+    drying = [
+      canvas.animate([{ opacity: 1, filter: 'blur(0)' }, { opacity: .55, filter: 'blur(.3px)', offset: .6 }, { opacity: 0, filter: 'blur(2.5px)' }],
+        { duration: reduce ? 150 : DRY_MS, easing: 'ease-in', fill: 'forwards' }),
+      drybar.animate([{ transform: 'scaleX(0)', opacity: 1 }, { transform: 'scaleX(1)', opacity: 1 }],
+        { duration: reduce ? 150 : DRY_MS, easing: 'linear', fill: 'forwards' }),
+    ];
+    idle = setTimeout(() => { if (drying) handOver(); }, reduce ? 150 : DRY_MS);   // the fade is only a picture; the timer decides
+  }
+
+  function beginStroke(e) {
+    if (e.pointerType === 'pen') sawPencil = true;
+    else if (e.pointerType === 'touch' && sawPencil) return false;   // palm resting on the glass
+    if (live) { strokes.push(live.pts); live = null; }                // previous stroke lost its lift: keep it
+    stopDrying();                                                     // keep writing: the ink comes back
+    if (!strokes.length) t0 = performance.now();
+    live = { id: e.pointerId, pts: [point(e)] };
+    // capture can fail when a quick stroke has already lifted; the stroke must still count
+    try { canvas.setPointerCapture(e.pointerId); } catch {}
+    inkhint.classList.add('gone');
+    return true;
+  }
+  canvas.addEventListener('pointerdown', e => { beginStroke(e); e.preventDefault(); });
+
+  // Safari reads a pen-down that follows a lift quickly as a double-tap and holds it back.
+  // Cancelling the touch gestures here hands every touch straight to the pen code.
+  const hush = e => { if (e.cancelable) e.preventDefault(); };
+  ['touchstart', 'touchmove', 'touchend', 'touchcancel', 'gesturestart', 'gesturechange', 'dblclick']
+    .forEach(ev => inkwell.addEventListener(ev, hush, { passive: false }));
+
+  canvas.addEventListener('pointermove', e => {
+    // if Safari swallowed the pen-down, start the stroke from the first movement instead
+    if (!live && (e.buttons & 1 || (e.pointerType === 'pen' && e.pressure > 0)) && !beginStroke(e)) return;
+    if (!live || e.pointerId !== live.id) return;
+    const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+    for (const ev of evs.length ? evs : [e]) {
+      const p = point(ev), last = live.pts[live.pts.length - 1];
+      if (Math.hypot(p.x - last.x, p.y - last.y) < 0.8) continue;
+      seg(last, p); live.pts.push(p);
+    }
+  });
+  function endStroke(e) {
+    if (!live || e.pointerId !== live.id) return;
+    if (live.pts.length === 1) { const p = live.pts[0]; seg(p, { ...p, x: p.x + .5 }); }
+    strokes.push(live.pts); live = null;
+    unlockAudio();
+    scheduleDry();
+  }
+  canvas.addEventListener('pointerup', endStroke);
+  canvas.addEventListener('pointercancel', endStroke);
+
+  function clearInk() {
+    stopDrying(); strokes = []; live = null;
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.restore();
+  }
+
+  // Google's handwriting recognizer (the one behind handwriting input in Google Translate) accepts
+  // requests from any page, so the diary needs no server of its own.
+  const RECOGNIZER = 'https://inputtools.google.com/request?ime=handwriting&app=mobilesearch&cs=1&oe=UTF-8';
+  async function recognize(ink, w, h) {
+    const res = await fetch(RECOGNIZER, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        options: 'enable_pre_space',
+        requests: [{
+          writing_guide: { writing_area_width: Math.round(w), writing_area_height: Math.round(h) },
+          ink, language: 'en', max_num_results: 10, max_completions: 0,
+        }],
+      }),
+    });
+    if (!res.ok) throw new Error('read failed');
+    const data = await res.json();
+    return data[0] === 'SUCCESS' ? (data[1][0][1] || []) : [];
+  }
+
+  // The dried ink is taken off the page at once, so the area is free for the next words
+  // while the recognizer reads it and Tom answers.
+  function handOver() {
+    if (!strokes.length || busy) return;
+    const r = canvas.getBoundingClientRect();
+    const ink = strokes.map(s => [s.map(p => Math.round(p.x)), s.map(p => Math.round(p.y)), s.map(p => p.t)]);
+    clearInk();
+    const reading = recognize(ink, r.width, r.height).catch(() => null);
+    answer(async () => {
+      const cands = ((await reading) || []).map(c => c.trim()).filter(Boolean);
+      const text = cands.length ? choose(cands) : null;
+      heard.textContent = text ? `The diary read \u201c${text}\u201d` : '';
+      return text;
+    });
+  }
+
+  function nudge(msg) {
+    inkhint.textContent = msg; inkhint.classList.remove('gone');
+    clearTimeout(nudge.t); nudge.t = setTimeout(() => { if (strokes.length || state.step) inkhint.classList.add('gone'); }, 1800);
+  }
+  $('#offer').addEventListener('click', e => {
+    e.stopPropagation();
+    if (typing) { if (pen.value.trim()) submit(); else pen.focus(); return; }
+    if (!strokes.length) { nudge('Write something first\u2026'); return; }
+    if (busy) { nudge('Tom is still writing. Yours goes next.'); scheduleDry(400); return; }
+    scheduleDry(0);
+  });
+  $('#clear').addEventListener('click', e => { e.stopPropagation(); clearInk(); pen.value = ''; autosize(); });
+  $('#mode').addEventListener('click', e => {
+    e.stopPropagation();
+    typing = !typing;
+    inkwell.hidden = typing; pen.hidden = !typing;
+    e.currentTarget.textContent = typing ? 'Write by hand' : 'Type instead';
+    if (typing) { clearInk(); autosize(); pen.focus(); }
+    else requestAnimationFrame(sizeCanvas);
+  });
+  page.addEventListener('click', e => {
+    if (e.target.closest('.inkwell')) return;                   // pen taps never hurry Tom
+    if (writing) { skipping = true; current?.finish(); return; }
+    if (typing && !e.target.closest('.rub, button')) pen.focus({ preventScroll: true });
+  });
+  addEventListener('resize', () => requestAnimationFrame(sizeCanvas));
+
+  // ------------------------------------------------------------------ open the diary
+  async function open() {
+    updateFolio();
+    sizeCanvas();
+    try { await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))]); } catch {}
+    if (state.step === END) page.classList.add('warm');
+    if (state.step > 0) {
+      inkhint.classList.add('gone');
+      const s = STEPS[state.step];
+      const greet = state.step === END ? 'You came back, {name}. It is still here.' : 'You came back, {name}.';
+      busy = true;
+      try {
+        await sleep(700);
+        await perform([greet, ...(s.restate || s.prompt)()]);
+      } finally { busy = false; }
+    }
+  }
+  open();
+})();
+</script>
